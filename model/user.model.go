@@ -8,6 +8,6 @@ import (
 type User struct {
 	gorm.Model
 	Name        string
-	PhoneNumber string
+	PhoneNumber string `gorm:"column:phoneNumber"`
 	Password    string
 }

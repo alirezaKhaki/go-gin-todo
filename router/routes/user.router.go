@@ -20,7 +20,7 @@ func SetupUserRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		userRoutes.GET("/findOne", func(ctx *gin.Context) {
 			user := userController.FindOne(ctx)
 			if user.Err != nil {
-				ctx.JSON(http.StatusBadRequest, gin.H{"error": user.Err})
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": user.Err.Error()})
 
 			}
 			ctx.JSON(200, user.Value)

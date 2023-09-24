@@ -1,7 +1,7 @@
 package controller
 
 import (
-	dto "github.com/alirezaKhaki/go-gin/dto/user"
+	"github.com/alirezaKhaki/go-gin/dto"
 	models "github.com/alirezaKhaki/go-gin/model"
 	"github.com/alirezaKhaki/go-gin/service"
 	"github.com/gin-gonic/gin"
@@ -22,10 +22,6 @@ type Result struct {
 	Err   error
 }
 
-type PhoneNumberRequestBody struct {
-	PhoneNumber string `json:"phoneNumber"`
-}
-
 func NewUserController(service service.IUserService) IUserContoller {
 	return &userController{
 		service: service,
@@ -33,10 +29,10 @@ func NewUserController(service service.IUserService) IUserContoller {
 }
 
 func (c *userController) FindOne(ctx *gin.Context) Result {
-	var requestBody PhoneNumberRequestBody
+	var requestBody dto.FindOneUserRequestBodyDto
 
 	// Bind the request body to the struct
-	if err := ctx.Bind(&requestBody); err != nil {
+	if err := ctx.ShouldBindJSON(&requestBody); err != nil {
 		return Result{models.User{}, err}
 	}
 

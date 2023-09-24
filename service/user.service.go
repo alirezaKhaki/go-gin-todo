@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 
-	dto "github.com/alirezaKhaki/go-gin/dto/user"
+	dto "github.com/alirezaKhaki/go-gin/dto"
 	models "github.com/alirezaKhaki/go-gin/model"
 	"github.com/jinzhu/gorm"
 )
@@ -32,7 +32,7 @@ func (service *userService) Create(body dto.CreateUserRequestBodyDto) (string, e
 
 func (service *userService) FindOne(phoneNumber string) (models.User, error) {
 	var user models.User
-	err := service.db.Where("phoneNumber", phoneNumber).First(&user).Error
+	err := service.db.Where(`"phoneNumber" = ?`, phoneNumber).First(&user).Error
 	if err != nil {
 		fmt.Println(err)
 		return user, err

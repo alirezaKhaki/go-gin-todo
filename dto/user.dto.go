@@ -5,3 +5,7 @@ type CreateUserRequestBodyDto struct {
 	PhoneNumber string `json:"phoneNumber" binding:"required"`
 	Password    string `json:"password" binding:"required"`
 }
+
+type FindOneUserRequestBodyDto struct {
+	PhoneNumber string `json:"phoneNumber" binding:"required" form:"phoneNumber"`
+}
