@@ -21,5 +21,7 @@ func (s *videoService) Save(video entity.Video) entity.Video {
 }
 
 func (s *videoService) FindAll() []entity.Video {
+	video := entity.Video{Title: "test", Description: "test", URL: "www.test.com"}
+	s.videos = append(s.videos, video)
 	return s.videos
 }
