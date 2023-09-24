@@ -1,6 +1,9 @@
 package service
 
-import "github.com/alirezaKhaki/go-gin/entity"
+import (
+	"github.com/alirezaKhaki/go-gin/entity"
+	"github.com/jinzhu/gorm"
+)
 
 type VideoService interface {
 	Save(entity.Video) entity.Video
@@ -9,10 +12,11 @@ type VideoService interface {
 
 type videoService struct {
 	videos []entity.Video
+	db     *gorm.DB
 }
 
-func NewVideoService() VideoService {
-	return &videoService{}
+func NewVideoService(db *gorm.DB) VideoService {
+	return &videoService{db: db}
 }
 
 func (s *videoService) Save(video entity.Video) entity.Video {
