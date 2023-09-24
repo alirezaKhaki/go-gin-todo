@@ -7,7 +7,7 @@ import (
 )
 
 type VideoController interface {
-	FindAll() []entity.Video
+	FindAll(ctx *gin.Context) []entity.Video
 	Save(ctx *gin.Context) entity.Video
 }
 
@@ -21,7 +21,7 @@ func NewVideoController(service service.VideoService) VideoController {
 	}
 }
 
-func (c *controller) FindAll() []entity.Video {
+func (c *controller) FindAll(ctx *gin.Context) []entity.Video {
 	return c.service.FindAll()
 }
 
