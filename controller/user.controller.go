@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"errors"
+	"net/http"
 
 	"github.com/alirezaKhaki/go-gin/dto"
 	models "github.com/alirezaKhaki/go-gin/model"
@@ -10,8 +10,8 @@ import (
 )
 
 type IUserContoller interface {
-	Create(ctx *gin.Context) (string, error)
-	FindOne(ctx *gin.Context) Result
+	Create(ctx *gin.Context)
+	FindOne(ctx *gin.Context)
 }
 
 type userController struct {
@@ -30,50 +30,53 @@ func NewUserController(service service.IUserService) IUserContoller {
 	}
 }
 
-func (c *userController) FindOne(ctx *gin.Context) Result {
+func (c *userController) FindOne(ctx *gin.Context) {
 	// Retrieve the user from the context
 	claims, exists := ctx.Get("user")
 
 	if !exists {
-		return Result{models.User{}, errors.New("user not found")}
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Token"})
+		return
 	}
 
 	// Access the user as needed
 	customClaims, ok := claims.(*models.UserClaims)
 	if !ok {
 		// Handle unexpected claim type
-		return Result{models.User{}, errors.New("invalid claim type")}
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid claim type"})
+		return
 	}
-
-	// var requestBody dto.FindOneUserRequestBodyDto
-
-	// // Bind the request body to the struct
-	// if err := ctx.ShouldBindJSON(&requestBody); err != nil {
-	// 	return Result{models.User{}, err}
-	// }
 
 	// Access the phone number
 	phoneNumber := customClaims.PhoneNumber
 
 	user, err := c.service.FindOne(phoneNumber)
 	if err != nil {
-		return Result{models.User{}, err}
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	return Result{Value: user, Err: nil}
+
+	if len(user.PhoneNumber) == 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"user": user})
 }
 
-func (c *userController) Create(ctx *gin.Context) (string, error) {
+func (c *userController) Create(ctx *gin.Context) {
 	var requestBody dto.CreateUserRequestBodyDto
 
 	// Bind the request body to the struct
 	if err := ctx.ShouldBindJSON(&requestBody); err != nil {
-		return "", err
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	token, err := c.service.Create(requestBody)
 	if err != nil {
-		return "", err
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	return token, nil
-
+	ctx.JSON(http.StatusOK, gin.H{"token": token})
 }
