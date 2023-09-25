@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"errors"
+
 	"github.com/alirezaKhaki/go-gin/dto"
 	models "github.com/alirezaKhaki/go-gin/model"
 	"github.com/alirezaKhaki/go-gin/service"
@@ -29,15 +31,29 @@ func NewUserController(service service.IUserService) IUserContoller {
 }
 
 func (c *userController) FindOne(ctx *gin.Context) Result {
-	var requestBody dto.FindOneUserRequestBodyDto
+	// Retrieve the user from the context
+	claims, exists := ctx.Get("user")
 
-	// Bind the request body to the struct
-	if err := ctx.ShouldBindJSON(&requestBody); err != nil {
-		return Result{models.User{}, err}
+	if !exists {
+		return Result{models.User{}, errors.New("user not found")}
 	}
 
+	// Access the user as needed
+	customClaims, ok := claims.(*models.UserClaims)
+	if !ok {
+		// Handle unexpected claim type
+		return Result{models.User{}, errors.New("invalid claim type")}
+	}
+
+	// var requestBody dto.FindOneUserRequestBodyDto
+
+	// // Bind the request body to the struct
+	// if err := ctx.ShouldBindJSON(&requestBody); err != nil {
+	// 	return Result{models.User{}, err}
+	// }
+
 	// Access the phone number
-	phoneNumber := requestBody.PhoneNumber
+	phoneNumber := customClaims.PhoneNumber
 
 	user, err := c.service.FindOne(phoneNumber)
 	if err != nil {
