@@ -13,6 +13,11 @@ type User struct {
 	Password    string
 }
 
+// TableName gives table name of model
+func (u User) TableName() string {
+	return "users"
+}
+
 // UserClaims represents the claims in a JWT token.
 type UserClaims struct {
 	UserID      uint   `json:"id"`

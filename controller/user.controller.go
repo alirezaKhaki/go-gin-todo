@@ -2,81 +2,114 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
-	"github.com/alirezaKhaki/go-gin/dto"
+	"github.com/alirezaKhaki/go-gin/constants"
+	"github.com/alirezaKhaki/go-gin/domain"
+	"github.com/alirezaKhaki/go-gin/lib"
 	models "github.com/alirezaKhaki/go-gin/model"
-	"github.com/alirezaKhaki/go-gin/service"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-type IUserContoller interface {
-	Create(ctx *gin.Context)
-	FindOne(ctx *gin.Context)
+type UserController struct {
+	service domain.IUserService
+	logger  lib.Logger
 }
 
-type userController struct {
-	service service.IUserService
-}
-
-// Define a custom result type
-type Result struct {
-	Value models.User
-	Err   error
-}
-
-func NewUserController(service service.IUserService) IUserContoller {
-	return &userController{
-		service: service,
+func NewUserController(userService domain.IUserService, logger lib.Logger) UserController {
+	return UserController{
+		service: userService,
+		logger:  logger,
 	}
 }
 
-func (c *userController) FindOne(ctx *gin.Context) {
-	// Retrieve the user from the context
-	claims, exists := ctx.Get("user")
+// GetOneUser gets one user
+func (u UserController) GetOneUser(c *gin.Context) {
+	paramID := c.Param("id")
 
-	if !exists {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Token"})
-		return
-	}
-
-	// Access the user as needed
-	customClaims, ok := claims.(*models.UserClaims)
-	if !ok {
-		// Handle unexpected claim type
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid claim type"})
-		return
-	}
-
-	// Access the phone number
-	phoneNumber := customClaims.PhoneNumber
-
-	user, err := c.service.FindOne(phoneNumber)
+	id, err := strconv.Atoi(paramID)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		u.logger.Error(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
+	user, err := u.service.GetOneUser(uint(id))
+
+	if err != nil {
+		u.logger.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 
-	if len(user.PhoneNumber) == 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "User not found"})
-		return
-	}
+	c.JSON(200, gin.H{
+		"data": user,
+	})
 
-	ctx.JSON(http.StatusOK, gin.H{"user": user})
 }
 
-func (c *userController) Create(ctx *gin.Context) {
-	var requestBody dto.CreateUserRequestBodyDto
-
-	// Bind the request body to the struct
-	if err := ctx.ShouldBindJSON(&requestBody); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	token, err := c.service.Create(requestBody)
+// GetUser gets the user
+func (u UserController) GetUser(c *gin.Context) {
+	users, err := u.service.GetAllUser()
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		u.logger.Error(err)
+	}
+	c.JSON(200, gin.H{"data": users})
+}
+
+// SaveUser saves the user
+func (u UserController) SaveUser(c *gin.Context) {
+	user := models.User{}
+	trxHandle := c.MustGet(constants.DBTransaction).(*gorm.DB)
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		u.logger.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"token": token})
+
+	if err := u.service.WithTrx(trxHandle).CreateUser(user); err != nil {
+		u.logger.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": "user created"})
+}
+
+// UpdateUser updates user
+func (u UserController) UpdateUser(c *gin.Context) {
+	c.JSON(200, gin.H{"data": "user updated"})
+}
+
+// DeleteUser deletes user
+func (u UserController) DeleteUser(c *gin.Context) {
+	paramID := c.Param("id")
+
+	id, err := strconv.Atoi(paramID)
+	if err != nil {
+		u.logger.Error(err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	if err := u.service.DeleteUser(uint(id)); err != nil {
+		u.logger.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": "user deleted"})
 }

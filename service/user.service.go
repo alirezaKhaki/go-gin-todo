@@ -1,85 +1,54 @@
 package service
 
 import (
-	"errors"
-
-	dto "github.com/alirezaKhaki/go-gin/dto"
+	"github.com/alirezaKhaki/go-gin/domain"
+	"github.com/alirezaKhaki/go-gin/lib"
 	models "github.com/alirezaKhaki/go-gin/model"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/jinzhu/gorm"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/alirezaKhaki/go-gin/repository"
+	"gorm.io/gorm"
 )
 
-type IUserService interface {
-	Create(user dto.CreateUserRequestBodyDto) (string, error)
-	FindOne(phoneNumber string) (models.User, error)
-	GenerateToken(user models.User) (string, error)
+// UserService service layer
+type UserService struct {
+	logger     lib.Logger
+	repository repository.UserRepository
 }
 
-type userService struct {
-	db *gorm.DB
+// NewUserService creates a new userservice
+func NewUserService(logger lib.Logger, repository repository.UserRepository) domain.IUserService {
+	return UserService{
+		logger:     logger,
+		repository: repository,
+	}
 }
 
-func NewUserService(db *gorm.DB) IUserService {
-	return &userService{db: db}
+// WithTrx delegates transaction to repository database
+func (s UserService) WithTrx(trxHandle *gorm.DB) domain.IUserService {
+	s.repository = s.repository.WithTrx(trxHandle)
+	return s
 }
 
-func (service *userService) Create(body dto.CreateUserRequestBodyDto) (string, error) {
-	user, err := service.FindOne(body.PhoneNumber)
-	if err != nil {
-		return "error", err
-	}
-
-	if len(user.PhoneNumber) > 0 {
-		return "", errors.New("user already exist")
-	}
-
-	password := []byte(body.Password)
-	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-
-	newUser := &models.User{
-		Name:        body.Name,
-		PhoneNumber: body.PhoneNumber,
-		Password:    string(hashedPassword),
-	}
-
-	err = service.db.Create(newUser).Error
-	if err != nil {
-		return "", err
-	}
-
-	createdUser := *newUser
-
-	token, err := service.GenerateToken(createdUser)
-
-	if err != nil {
-		return "", err
-	}
-
-	return token, nil
+// GetOneUser gets one user
+func (s UserService) GetOneUser(id uint) (user models.User, err error) {
+	return user, s.repository.Find(&user, id).Error
 }
 
-func (service *userService) FindOne(phoneNumber string) (models.User, error) {
-	var user models.User
-	if err := service.db.Where(`"phoneNumber" = ?`, phoneNumber).First(&user).Error; err != nil {
-		// Handle the error, user not found, or other issues
-		// You can check err for gorm.ErrRecordNotFound to specifically handle "user not found" scenarios
-		if err.Error() != gorm.ErrRecordNotFound.Error() {
-			return user, err
-		}
-	}
-
-	return user, nil
+// GetAllUser get all the user
+func (s UserService) GetAllUser() (users []models.User, err error) {
+	return users, s.repository.Find(&users).Error
 }
 
-func (service *userService) GenerateToken(user models.User) (string, error) {
-	claims := models.UserClaims{UserID: user.ID, PhoneNumber: user.PhoneNumber}
+// CreateUser call to create the user
+func (s UserService) CreateUser(user models.User) error {
+	return s.repository.Create(&user).Error
+}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	secretKey := []byte("your-secret-key")
+// UpdateUser updates the user
+func (s UserService) UpdateUser(user models.User) error {
+	return s.repository.Save(&user).Error
+}
 
-	return token.SignedString(secretKey)
+// DeleteUser deletes the user
+func (s UserService) DeleteUser(id uint) error {
+	return s.repository.Delete(&models.User{}, id).Error
 }
