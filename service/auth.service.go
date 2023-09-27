@@ -44,7 +44,8 @@ func (s JWTAuthService) Authorize(tokenString string) (bool, error) {
 func (s JWTAuthService) CreateToken(user models.User) string {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":          user.ID,
-		"phoneNumber": user.PhoneNumber,
+		"name":        user.Name,
+		"phoneNumber": user.Email,
 	})
 
 	tokenString, err := token.SignedString([]byte(s.env.JWTSecret))
