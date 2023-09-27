@@ -1,9 +1,9 @@
 package router
 
 import (
-	"github.com/alirezaKhaki/go-gin/controller"
+	"github.com/alirezaKhaki/go-gin/api/controller"
+	"github.com/alirezaKhaki/go-gin/api/middleware"
 	"github.com/alirezaKhaki/go-gin/lib"
-	"github.com/alirezaKhaki/go-gin/middleware"
 )
 
 type UserRoutes struct {
@@ -30,7 +30,7 @@ func NewUserRoutes(
 
 // Set up routes for the user controller
 func (u UserRoutes) Setup() {
-	userRoutes := u.handler.Gin.Group("/user")
+	userRoutes := u.handler.ApiGroup.Group("/user")
 	{
 		userRoutes.GET("/", u.authMiddleware.Handler(), u.userController.GetOneUser)
 

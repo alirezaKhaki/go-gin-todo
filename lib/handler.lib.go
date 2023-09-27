@@ -6,12 +6,14 @@ import (
 
 // RequestHandler function
 type RequestHandler struct {
-	Gin *gin.Engine
+	Gin      *gin.Engine
+	ApiGroup *gin.RouterGroup
 }
 
 // NewRequestHandler creates a new request handler
 func NewRequestHandler(logger Logger) RequestHandler {
 	gin.DefaultWriter = logger.GetGinLogger()
 	engine := gin.New()
-	return RequestHandler{Gin: engine}
+	apiGroup := engine.Group("/api/v1")
+	return RequestHandler{Gin: engine, ApiGroup: apiGroup}
 }

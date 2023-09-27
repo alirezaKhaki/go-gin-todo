@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/alirezaKhaki/go-gin/api/middleware"
+	"github.com/alirezaKhaki/go-gin/api/router"
 	"github.com/alirezaKhaki/go-gin/lib"
-	"github.com/alirezaKhaki/go-gin/middleware"
-	"github.com/alirezaKhaki/go-gin/router"
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
 )
