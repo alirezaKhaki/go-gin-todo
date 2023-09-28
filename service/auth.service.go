@@ -23,21 +23,21 @@ func NewJWTAuthService(env lib.Env, logger lib.Logger) domain.AuthService {
 }
 
 // Authorize authorizes the generated token
-func (s JWTAuthService) Authorize(tokenString string) (bool, error) {
+func (s JWTAuthService) Authorize(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return []byte(s.env.JWTSecret), nil
 	})
 	if token.Valid {
-		return true, nil
+		return token, nil
 	} else if ve, ok := err.(*jwt.ValidationError); ok {
 		if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-			return false, errors.New("token malformed")
+			return nil, errors.New("token malformed")
 		}
 		if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
-			return false, errors.New("token expired")
+			return nil, errors.New("token expired")
 		}
 	}
-	return false, errors.New("couldn't handle token")
+	return nil, errors.New("couldn't handle token")
 }
 
 // CreateToken creates jwt auth tolib

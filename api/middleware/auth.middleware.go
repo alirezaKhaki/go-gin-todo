@@ -6,8 +6,10 @@ import (
 
 	"github.com/alirezaKhaki/go-gin/domain"
 	"github.com/alirezaKhaki/go-gin/lib"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
+
 // JWTAuthMiddleware middleware for jwt authentication
 type JWTAuthMiddleware struct {
 	service domain.AuthService
@@ -36,8 +38,27 @@ func (m JWTAuthMiddleware) Handler() gin.HandlerFunc {
 		if len(t) == 2 {
 			authToken := t[1]
 			authorized, err := m.service.Authorize(authToken)
-			if authorized {
+			if authorized.Valid {
+
+				claims, ok := authorized.Claims.(jwt.MapClaims)
+				if !ok {
+					c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid token claims"})
+					c.Abort()
+					return
+				}
+
+				// Get user information from the token
+				userID, ok := claims["id"].(float64)
+				if !ok {
+					c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid user ID"})
+					c.Abort()
+					return
+				}
+
+				// Attach user information to the context for use in handlers
+				c.Set("id", int(userID))
 				c.Next()
+
 				return
 			}
 			c.JSON(http.StatusInternalServerError, gin.H{

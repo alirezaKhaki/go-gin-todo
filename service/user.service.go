@@ -12,14 +12,15 @@ import (
 type UserService struct {
 	logger     lib.Logger
 	repository repository.UserRepository
-	jwtService JWTAuthService
+	jwtService domain.AuthService
 }
 
 // NewUserService creates a new userservice
-func NewUserService(logger lib.Logger, repository repository.UserRepository) domain.IUserService {
+func NewUserService(logger lib.Logger, repository repository.UserRepository, jwtService domain.AuthService) domain.IUserService {
 	return UserService{
 		logger:     logger,
 		repository: repository,
+		jwtService: jwtService,
 	}
 }
 
@@ -34,8 +35,8 @@ func (s UserService) GetAllUser() (users []models.User, err error) {
 }
 
 // CreateUser call to create the user
-func (s UserService) CreateUser(dto.CreateUserRequestBodyDto) (*string, error) {
-	var user models.User
+func (s UserService) CreateUser(body dto.CreateUserRequestBodyDto) (*string, error) {
+	user := models.User{Name: body.Name, Email: body.Email, Password: body.Password}
 	if err := s.repository.Create(&user).Error; err != nil {
 		return nil, err
 	}
@@ -44,7 +45,7 @@ func (s UserService) CreateUser(dto.CreateUserRequestBodyDto) (*string, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return token, nil
 }
 

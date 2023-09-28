@@ -4,12 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	// "github.com/alirezaKhaki/go-gin/constants"
 	"github.com/alirezaKhaki/go-gin/domain"
 	"github.com/alirezaKhaki/go-gin/dto"
 	"github.com/alirezaKhaki/go-gin/lib"
 	"github.com/gin-gonic/gin"
-	// "gorm.io/gorm"
 )
 
 // type I
@@ -28,17 +26,9 @@ func NewUserController(userService domain.IUserService, logger lib.Logger) UserC
 
 // GetOneUser gets one user
 func (u UserController) GetOneUser(c *gin.Context) {
-	paramID := c.Param("id")
+	userID := c.MustGet("id").(int)
 
-	id, err := strconv.Atoi(paramID)
-	if err != nil {
-		u.logger.Error(err)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
-		})
-		return
-	}
-	user, err := u.service.GetOneUser(uint(id))
+	user, err := u.service.GetOneUser(uint(userID))
 
 	if err != nil {
 		u.logger.Error(err)
