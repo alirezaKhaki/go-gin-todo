@@ -11,14 +11,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// type I
+type IUserController interface {
+	GetOneUser(c *gin.Context)
+	GetUser(c *gin.Context)
+	SaveUser(c *gin.Context)
+	UpdateUser(c *gin.Context)
+	DeleteUser(c *gin.Context)
+}
 
 type UserController struct {
 	service domain.IUserService
 	logger  lib.Logger
 }
 
-func NewUserController(userService domain.IUserService, logger lib.Logger) UserController {
+func NewUserController(userService domain.IUserService, logger lib.Logger) IUserController {
 	return UserController{
 		service: userService,
 		logger:  logger,

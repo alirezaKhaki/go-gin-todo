@@ -9,7 +9,7 @@ import (
 type UserRoutes struct {
 	logger         lib.Logger
 	handler        lib.RequestHandler
-	userController controller.UserController
+	userController controller.IUserController
 	authMiddleware middleware.JWTAuthMiddleware
 }
 
@@ -17,7 +17,7 @@ type UserRoutes struct {
 func NewUserRoutes(
 	logger lib.Logger,
 	handler lib.RequestHandler,
-	userController controller.UserController,
+	userController controller.IUserController,
 	authMiddleware middleware.JWTAuthMiddleware,
 ) UserRoutes {
 	return UserRoutes{
