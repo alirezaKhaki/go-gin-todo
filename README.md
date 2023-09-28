@@ -46,7 +46,7 @@ go run main.go
 - [x] Use of Modules and injection of them.
 - [x] Use of Repository pattern.
 - [x] Use of Interfaces.
-- [x] Use of Go routines and concurrency patterns.
+- [ ] Use of Go routines and concurrency patterns.
 - [ ] Logic for Todo list
 - [ ] Swagger documentation examples
 - [ ] Unit testing examples.
