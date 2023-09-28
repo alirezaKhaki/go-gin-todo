@@ -1,4 +1,4 @@
-# Go-gin with modular dependency
+# Go-gin with modular dependency injection
 
 Clean architecture template with gin framework, go-fx as dependency container, gorm as orm for database related operations.
 
@@ -43,8 +43,13 @@ go run main.go
 
 ## Todos
 
-- [x] Use of Interfaces
-- [ ] Logic for todo list
+- [x] Use of Modules and injection of them.
+- [x] Use of Repository pattern.
+- [x] Use of Interfaces.
+- [x] Use of Go routines and concurrency patterns.
+- [ ] Logic for Todo list
 - [ ] Swagger documentation examples
 - [ ] Unit testing examples.
-- [ ] File upload middelware.
+- [ ] File upload middleware.
+- [ ] Implementing DDD.
+
