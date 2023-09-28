@@ -9,6 +9,6 @@ type IUserService interface {
 	GetOneUser(id uint) (models.User, error)
 	GetAllUser() ([]models.User, error)
 	CreateUser(dto.CreateUserRequestBodyDto) (*string, error)
-	UpdateUser(models.User) error
+	UpdateUser(userId uint, body dto.UpdateUserBodyDto) (*models.User, error)
 	DeleteUser(id uint) error
 }

@@ -50,8 +50,17 @@ func (s UserService) CreateUser(body dto.CreateUserRequestBodyDto) (*string, err
 }
 
 // UpdateUser updates the user
-func (s UserService) UpdateUser(user models.User) error {
-	return s.repository.Save(&user).Error
+func (s UserService) UpdateUser(userId uint, body dto.UpdateUserBodyDto) (*models.User, error) {
+	user, err := s.GetOneUser(userId)
+	if err != nil {
+		return nil, err
+	}
+	user.Name = body.Name
+	err = s.repository.Save(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, err
 }
 
 // DeleteUser deletes the user

@@ -33,7 +33,7 @@ func (u UserRoutes) Setup() {
 	userRoutes := u.handler.ApiGroup.Group("/user")
 	{
 		userRoutes.GET("/", u.authMiddleware.Handler(), u.userController.GetOneUser)
-
 		userRoutes.POST("/", u.userController.SaveUser)
+		userRoutes.PATCH("/", u.authMiddleware.Handler(), u.userController.UpdateUser)
 	}
 }

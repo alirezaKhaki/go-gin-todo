@@ -7,6 +7,7 @@ import (
 	"github.com/alirezaKhaki/go-gin/domain"
 	"github.com/alirezaKhaki/go-gin/dto"
 	"github.com/alirezaKhaki/go-gin/lib"
+	"github.com/alirezaKhaki/go-gin/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,8 +39,11 @@ func (u UserController) GetOneUser(c *gin.Context) {
 		return
 	}
 
+	response := dto.UserResponseDto{}
+	util.ObjectAssign(&response, &user)
+
 	c.JSON(200, gin.H{
-		"data": user,
+		"data": response,
 	})
 
 }
@@ -78,7 +82,31 @@ func (u UserController) SaveUser(c *gin.Context) {
 
 // UpdateUser updates user
 func (u UserController) UpdateUser(c *gin.Context) {
-	c.JSON(200, gin.H{"data": "user updated"})
+	userID := c.MustGet("id").(int)
+
+	var requestBody dto.UpdateUserBodyDto
+
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		u.logger.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	user, err := u.service.UpdateUser(uint(userID), requestBody)
+
+	if err != nil {
+		u.logger.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	response := dto.UserResponseDto{}
+	util.ObjectAssign(&response, user)
+	c.JSON(200, gin.H{"data": response})
 }
 
 // DeleteUser deletes user
