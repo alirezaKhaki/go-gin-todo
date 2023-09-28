@@ -10,7 +10,8 @@ import (
 type User struct {
 	ID           uint           `json:"id"`
 	Name         string         `json:"name"`
-	Email        *string        `json:"email"`
+	Email        string         `json:"email"`
+	Password     string         `json:"password"`
 	Age          uint8          `json:"age"`
 	Birthday     *time.Time     `json:"time"`
 	MemberNumber sql.NullString `json:"member_number"`

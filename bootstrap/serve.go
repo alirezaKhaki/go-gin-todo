@@ -2,7 +2,6 @@ package bootstrap
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/alirezaKhaki/go-gin/api/middleware"
 	"github.com/alirezaKhaki/go-gin/api/router"
@@ -24,7 +23,6 @@ func RunServer(opt fx.Option) {
 	err := app.Start(ctx)
 	defer app.Stop(ctx)
 	if err != nil {
-		fmt.Println(err)
 		logger.Fatal(err)
 	}
 }

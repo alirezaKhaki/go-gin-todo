@@ -41,18 +41,18 @@ func (s JWTAuthService) Authorize(tokenString string) (bool, error) {
 }
 
 // CreateToken creates jwt auth tolib
-func (s JWTAuthService) CreateToken(user models.User) string {
+func (s JWTAuthService) CreateToken(user models.User) (*string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":          user.ID,
-		"name":        user.Name,
-		"phoneNumber": user.Email,
+		"id":    user.ID,
+		"name":  user.Name,
+		"email": user.Email,
 	})
 
 	tokenString, err := token.SignedString([]byte(s.env.JWTSecret))
 
 	if err != nil {
-		s.logger.Error("JWT validation failed: ", err)
+		return nil, err
 	}
 
-	return tokenString
+	return &tokenString, nil
 }

@@ -2,16 +2,17 @@ package service
 
 import (
 	"github.com/alirezaKhaki/go-gin/domain"
+	"github.com/alirezaKhaki/go-gin/dto"
 	"github.com/alirezaKhaki/go-gin/lib"
 	models "github.com/alirezaKhaki/go-gin/model"
 	"github.com/alirezaKhaki/go-gin/repository"
-	"gorm.io/gorm"
 )
 
 // UserService service layer
 type UserService struct {
 	logger     lib.Logger
 	repository repository.UserRepository
+	jwtService JWTAuthService
 }
 
 // NewUserService creates a new userservice
@@ -20,12 +21,6 @@ func NewUserService(logger lib.Logger, repository repository.UserRepository) dom
 		logger:     logger,
 		repository: repository,
 	}
-}
-
-// WithTrx delegates transaction to repository database
-func (s UserService) WithTrx(trxHandle *gorm.DB) domain.IUserService {
-	s.repository = s.repository.WithTrx(trxHandle)
-	return s
 }
 
 // GetOneUser gets one user
@@ -39,8 +34,18 @@ func (s UserService) GetAllUser() (users []models.User, err error) {
 }
 
 // CreateUser call to create the user
-func (s UserService) CreateUser(user models.User) error {
-	return s.repository.Create(&user).Error
+func (s UserService) CreateUser(dto.CreateUserRequestBodyDto) (*string, error) {
+	var user models.User
+	if err := s.repository.Create(&user).Error; err != nil {
+		return nil, err
+	}
+
+	token, err := s.jwtService.CreateToken(user)
+	if err != nil {
+		return nil, err
+	}
+	
+	return token, nil
 }
 
 // UpdateUser updates the user

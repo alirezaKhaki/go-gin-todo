@@ -4,13 +4,15 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/alirezaKhaki/go-gin/constants"
+	// "github.com/alirezaKhaki/go-gin/constants"
 	"github.com/alirezaKhaki/go-gin/domain"
+	"github.com/alirezaKhaki/go-gin/dto"
 	"github.com/alirezaKhaki/go-gin/lib"
-	models "github.com/alirezaKhaki/go-gin/model"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	// "gorm.io/gorm"
 )
+
+// type I
 
 type UserController struct {
 	service domain.IUserService
@@ -63,10 +65,9 @@ func (u UserController) GetUser(c *gin.Context) {
 
 // SaveUser saves the user
 func (u UserController) SaveUser(c *gin.Context) {
-	user := models.User{}
-	trxHandle := c.MustGet(constants.DBTransaction).(*gorm.DB)
+	var requestBody dto.CreateUserRequestBodyDto
 
-	if err := c.ShouldBindJSON(&user); err != nil {
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		u.logger.Error(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -74,15 +75,15 @@ func (u UserController) SaveUser(c *gin.Context) {
 		return
 	}
 
-	if err := u.service.WithTrx(trxHandle).CreateUser(user); err != nil {
+	token, err := u.service.CreateUser(requestBody)
+	if err != nil {
 		u.logger.Error(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
-		return
 	}
 
-	c.JSON(200, gin.H{"data": "user created"})
+	c.JSON(200, gin.H{"tokne": *token})
 }
 
 // UpdateUser updates user

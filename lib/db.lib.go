@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 
+	models "github.com/alirezaKhaki/go-gin/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -33,7 +34,16 @@ func NewDatabase(env Env, logger Logger) Database {
 
 	logger.Info("Database connection established")
 
+	migrate(env, logger, DB)
+
 	return Database{
 		DB: db,
+	}
+}
+
+func migrate(env Env, logger Logger, db *gorm.DB) {
+	if env.Environment == "development" {
+		db.AutoMigrate(&models.User{})
+		logger.Info("Database migration done")
 	}
 }
