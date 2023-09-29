@@ -3,13 +3,10 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // User model
 type User struct {
-	gorm.Model
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`

@@ -16,7 +16,7 @@ type UserRepository struct {
 }
 
 // NewUserRepository creates a new user repository
-func NewUserRepository(db lib.Database, logger lib.Logger) IUserRepository {
+func NewUserRepository(db lib.Database, logger lib.Logger) UserRepository {
 	return UserRepository{
 		Database: db,
 		logger:   logger,
