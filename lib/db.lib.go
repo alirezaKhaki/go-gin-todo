@@ -44,6 +44,7 @@ func NewDatabase(env Env, logger Logger) Database {
 func migrate(env Env, logger Logger, db *gorm.DB) {
 	if env.Environment == "development" {
 		db.AutoMigrate(&models.User{})
+		db.AutoMigrate(&models.Task{})
 		logger.Info("Database migration done")
 	}
 }
