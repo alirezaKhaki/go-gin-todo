@@ -12,6 +12,7 @@ import (
 )
 
 type IUserController interface {
+	Login(c *gin.Context)
 	GetOneUser(c *gin.Context)
 	GetUser(c *gin.Context)
 	SaveUser(c *gin.Context)
@@ -31,6 +32,31 @@ func NewUserController(userService domain.IUserService, logger lib.Logger) IUser
 	}
 }
 
+func (u UserController) Login(c *gin.Context) {
+	var requstBody dto.UserLoginRequestDto
+
+	if err := c.ShouldBindJSON(&requstBody); err != nil {
+		u.logger.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	token, err := u.service.Login(requstBody)
+	if err != nil {
+		u.logger.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"token": token,
+	})
+}
+
 // GetOneUser gets one user
 func (u UserController) GetOneUser(c *gin.Context) {
 	userID := c.MustGet("id").(int)
@@ -45,7 +71,7 @@ func (u UserController) GetOneUser(c *gin.Context) {
 		return
 	}
 
-	response := dto.UserResponseDto{}
+	response := dto.GetUserResponseDto{}
 	util.ObjectAssign(&response, &user)
 
 	c.JSON(200, gin.H{
@@ -110,7 +136,7 @@ func (u UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	response := dto.UserResponseDto{}
+	response := dto.GetUserResponseDto{}
 	util.ObjectAssign(&response, user)
 	c.JSON(200, gin.H{"data": response})
 }

@@ -11,4 +11,5 @@ type IUserService interface {
 	CreateUser(dto.CreateUserRequestBodyDto) (*string, error)
 	UpdateUser(userId uint, body dto.UpdateUserBodyDto) (*models.User, error)
 	DeleteUser(id uint) error
+	Login(dto.UserLoginRequestDto) (*string, error)
 }

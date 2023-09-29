@@ -34,6 +34,7 @@ func (u UserRoutes) Setup() {
 	{
 		userRoutes.GET("/", u.authMiddleware.Handler(), u.userController.GetOneUser)
 		userRoutes.POST("/", u.userController.SaveUser)
+		userRoutes.POST("/login", u.userController.Login)
 		userRoutes.PATCH("/", u.authMiddleware.Handler(), u.userController.UpdateUser)
 	}
 }
