@@ -54,8 +54,7 @@ go run main.go
 - [x] Use of Repository pattern.
 - [x] Use of Interfaces.
 - [ ] Use of Go routines and concurrency patterns.
-- [ ] Logic for Todo list
-- [ ] Swagger documentation examples
+- [x] Swagger documentation examples
 - [ ] Unit testing examples.
 - [ ] File upload middleware.
 - [ ] Implementing DDD.
