@@ -31,5 +31,7 @@ func (t TaskRoutes) Setup() {
 	taskRoutes := t.handler.ApiGroup.Group("/task")
 	{
 		taskRoutes.GET("/all", t.authMiddleware.Handler(), t.taskController.GetAllTasks)
+		taskRoutes.POST("/", t.authMiddleware.Handler(), t.taskController.CreateTask)
 	}
+
 }

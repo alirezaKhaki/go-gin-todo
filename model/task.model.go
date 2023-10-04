@@ -11,4 +11,6 @@ type Task struct {
 	Description string    `json:"description"`
 	Status      bool      `json:"status"`
 	DueDate     time.Time `json:"dueDate"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }

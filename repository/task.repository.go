@@ -7,6 +7,7 @@ import (
 
 type ITaskRepository interface {
 	GetAll(userId uint) ([]models.Task, error)
+	CreateTask(task *models.Task) error
 }
 
 type TaskRepository struct {
@@ -23,10 +24,18 @@ func NewTaskRepository(db lib.Database, logger lib.Logger) ITaskRepository {
 
 func (t TaskRepository) GetAll(userId uint) ([]models.Task, error) {
 	var tasks []models.Task
-	
+
 	if err := t.Model(&models.Task{UserID: (userId)}).Find(&tasks).Error; err != nil {
 		return nil, err
 	}
 
 	return tasks, nil
+}
+
+func (t TaskRepository) CreateTask(task *models.Task) error {
+	if err := t.Model(&models.Task{}).Save(task).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

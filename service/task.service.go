@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/alirezaKhaki/go-gin/domain"
+	"github.com/alirezaKhaki/go-gin/dto"
 	"github.com/alirezaKhaki/go-gin/lib"
 	models "github.com/alirezaKhaki/go-gin/model"
 	"github.com/alirezaKhaki/go-gin/repository"
@@ -28,6 +29,18 @@ func (s TaskService) GetTasks(userId int) ([]models.Task, error) {
 	return tasks, nil
 }
 
-// func (s TaskService) CreateTask(task models.Task) (string, error) {
+func (s TaskService) CreateTask(body dto.CreateTaskRequestBodyDto, userId int) (*models.Task, error) {
+	var task models.Task = models.Task{
+		UserID:      uint(userId),
+		Description: body.Description,
+		Title:       body.Title,
+		DueDate:     body.DueDate,
+		Status:      true,
+	}
 
-// }
+	if err := s.repository.CreateTask(&task); err != nil {
+		return nil, err
+	}
+
+	return &task, nil
+}
