@@ -51,7 +51,7 @@ func (u UserController) Login(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	c.JSON(http.StatusInternalServerError, gin.H{
 		"token": token,
 	})
