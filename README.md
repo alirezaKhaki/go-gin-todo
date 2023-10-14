@@ -48,14 +48,4 @@ go run main.go
 - Authentication (JWT)
 - Live code refresh
 
-## Todos
-
-- [x] Use of Modules and injection of them.
-- [x] Use of Repository pattern.
-- [x] Use of Interfaces.
-- [ ] Use of Go routines and concurrency patterns.
-- [x] Swagger documentation examples
-- [ ] Unit testing examples.
-- [ ] File upload middleware.
-- [ ] Implementing DDD.
 
